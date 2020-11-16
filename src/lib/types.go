@@ -1,17 +1,29 @@
 package lib
 
-import "net/http"
+import (
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"net/http"
+	"time"
+)
 
 type Route struct {
 	Name    string
 	Handler http.Handler
 }
 
-type IMusic struct {
-	Name string
+type IResource struct {
+
+}
+type ITrack struct{
+	ID primitive.ObjectID
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Title string
 	Artist string
 }
 
 type IEnvironment struct {
-	Port int
+	WebServerPort int
+	MongoURL string
+	MongoPort int
 }

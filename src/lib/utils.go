@@ -1,7 +1,6 @@
 package lib
 
 import (
-	"fmt"
 	"github.com/joho/godotenv"
 	"log"
 	"os"
@@ -9,25 +8,20 @@ import (
 )
 
 func dotEnvVariable(key string) string {
-	// load .env file
 	err := godotenv.Load(".env")
-
 	if err != nil {
 		log.Fatalf("Error loading .env file")
 	}
-
 	return os.Getenv(key)
 }
 
-func GetServerEnv()(error, IEnvironment) {
-	var strvar = dotEnvVariable("WEBSERVER_PORT")
+func GetServerEnv() IEnvironment {
+	wspStr := dotEnvVariable("WEBSERVER_PORT")
+	mongoURLStr := dotEnvVariable("MONGODB_URL")
+	mongoPortStr := dotEnvVariable("MONGODB_PORT")
 	var serverEnvironment IEnvironment
-	i, err := strconv.Atoi(strvar)
-	if err != nil {
-		fmt.Println("get server env error", err)
-	} else {
-		serverEnvironment = IEnvironment{Port: i}
-		fmt.Println("get server env success:", serverEnvironment)
-	}
-	return err, serverEnvironment
+	wsPort, _ := strconv.Atoi(wspStr)
+	mongoPort, _ := strconv.Atoi(mongoPortStr)
+	serverEnvironment = IEnvironment{WebServerPort: wsPort, MongoPort: mongoPort, MongoURL: mongoURLStr}
+	return serverEnvironment
 }

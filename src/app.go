@@ -1,30 +1,25 @@
 package src
 
 import (
-	"./music"
+	"./lib"
+	"./lib/db"
+	"./lib/http"
+	"./routes"
 	"encoding/json"
-	"net/http"
 	"fmt"
-	types "./lib"
-	"strconv"
+	"github.com/gorilla/mux"
 )
 
-var apiRoutes = []types.Route{music.MusicRoute}
 
+func InitServer(env lib.IEnvironment) {
+	APIEnv, _ := json.Marshal(env)
+	fmt.Println("API Environment", string(APIEnv))
 
-func makeRoutes(routes []types.Route) {
-	for _, fun := range routes {
-		http.Handle(fun.Name, fun.Handler)
-		fmt.Println("Route OK", fun.Name)
-	}
-}
+	lib.Router = mux.NewRouter()
+	routes.LoadRouters(lib.Router)
 
-func InitServer(env types.IEnvironment)  {
-	webenv, _ := json.Marshal(env)
-	fmt.Println("start server with env", string(webenv))
-	makeRoutes(apiRoutes)
-	err := http.ListenAndServe(":" + strconv.Itoa(env.Port), nil)
-	if err != nil {
-		fmt.Println("error", err)
-	}
+	dbName := "MyMusicAPI"
+
+	lib.MyMusicAPIDB, lib.DBContext = db.InitDB(env.MongoURL, env.MongoPort, dbName)
+	http.InitWebServer(env.WebServerPort, lib.Router)
 }

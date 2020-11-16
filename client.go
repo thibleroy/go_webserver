@@ -1,23 +1,23 @@
 package main
 
 import (
+	types "./src/lib"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"encoding/json"
-	types "./src/lib"
 )
 
 func main(){
-	var resp, err = http.Get("http://localhost:8080/music")
+	var resp, err = http.Get("http://localhost:8080/tracks/123")
 	 if resp != nil {
 		 body, _ := ioutil.ReadAll(resp.Body)
 		 if resp.StatusCode == 200 {
 			 fmt.Println("body value", string(body))
-			 var myMusic types.IMusic
+			 var myMusic types.ITrack
 			 err := json.Unmarshal(body, &myMusic)
 			 if err == nil {
-				 fmt.Println("music name", myMusic.Name)
+				 fmt.Println("music name", myMusic.Title)
 				 fmt.Println("artist name", myMusic.Artist)
 			 } else {
 				 fmt.Println("error", err)
