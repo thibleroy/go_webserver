@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-func GetMusic(id string) lib.ITrack {
+func GetTrack(id string) lib.ITrack {
 	return lib.ITrack{
 		ID:        primitive.ObjectID{},
 		CreatedAt: time.Now(),
