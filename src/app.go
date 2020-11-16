@@ -2,12 +2,14 @@ package src
 
 import (
 	"./music"
+	"encoding/json"
 	"net/http"
 	"fmt"
 	types "./lib"
+	"strconv"
 )
 
-var ApiRoutes = []types.Route{music.MusicRoute}
+var apiRoutes = []types.Route{music.MusicRoute}
 
 
 func makeRoutes(routes []types.Route) {
@@ -17,8 +19,12 @@ func makeRoutes(routes []types.Route) {
 	}
 }
 
-func init()  {
-	fmt.Println("start server on port")
-	makeRoutes(ApiRoutes)
-	http.ListenAndServe(":8080", nil)
+func InitServer(env types.IEnvironment)  {
+	webenv, _ := json.Marshal(env)
+	fmt.Println("start server with env", string(webenv))
+	makeRoutes(apiRoutes)
+	err := http.ListenAndServe(":" + strconv.Itoa(env.Port), nil)
+	if err != nil {
+		fmt.Println("error", err)
+	}
 }
