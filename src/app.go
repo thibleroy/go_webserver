@@ -11,7 +11,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-
 func InitServer(env lib.IEnvironment) {
 	// prints running environment
 	APIEnv, _ := json.Marshal(env)

@@ -19,7 +19,11 @@ func GetTrackController (w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	track := services.GetTrack(objId)
+	track, getError := services.GetTrack(objId)
+	if getError != nil {
+		w.WriteHeader(404)
+		return
+	}
 	value, _ := json.Marshal(track)
 	w.Write(value)
 }
@@ -39,19 +43,37 @@ func PostTrackController (w http.ResponseWriter, req *http.Request) {
 		log.Fatal(err)
 	}
 	returnId := services.PostTrack(track)
-	w.Header().Add("Location", req.Host + req.RequestURI + "/" + returnId.Hex())
+	w.Header().Add("Location", "http://" +req.Host + req.RequestURI + "/" + returnId.Hex())
+	w.WriteHeader(201)
 }
 
-func PuttTrackController (w http.ResponseWriter, req *http.Request) {
+func PutTrackController (w http.ResponseWriter, req *http.Request) {
+	id := mux.Vars(req)["id"]
+	fmt.Println("id received for put", id)
+	objId, errId := primitive.ObjectIDFromHex(id)
+	if errId != nil {
+		log.Fatal(errId)
+	}
 	var track lib.ITrack
 	bodyTrack,_ := ioutil.ReadAll(req.Body)
-
 	err := json.Unmarshal(bodyTrack, &track)
 	if err != nil {
 		fmt.Println("error")
 		log.Fatal(err)
 	}
+	track.ID = objId
 	returnId := services.PutTrack(track)
-	value, _ := json.Marshal(lib.IPostReturn{ID: returnId})
-	w.Write(value)
+	w.WriteHeader(204)
+	w.Header().Add("Location", req.Host + req.RequestURI + "/" + returnId.Hex())
+}
+
+func DeleteTrackController (w http.ResponseWriter, req *http.Request) {
+	id := mux.Vars(req)["id"]
+	fmt.Println("id received for put", id)
+	objId, errId := primitive.ObjectIDFromHex(id)
+	if errId != nil {
+		log.Fatal(errId)
+	}
+	services.DeleteTrack(objId)
+	w.WriteHeader(204)
 }
