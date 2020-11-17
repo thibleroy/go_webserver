@@ -31,3 +31,18 @@ type IEnvironment struct {
 type IPostReturn struct {
 	ID primitive.ObjectID
 }
+
+type HTTPReqInfo struct {
+	// GET etc.
+	method string
+	uri string
+	referer string
+	ipaddr string
+	// response code, like 200, 404
+	code int
+	// number of bytes of the response sent
+	size int64
+	// how long did it take to
+	duration time.Duration
+	userAgent string
+}

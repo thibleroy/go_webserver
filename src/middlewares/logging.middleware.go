@@ -7,9 +7,7 @@ import (
 
 func loggingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Do stuff here
-		log.Println(r.RequestURI)
-		// Call the next handler, which can be another middleware in the chain, or the final handler.
+		log.Println(r.RemoteAddr, r.Method, r.URL.Path, r.RemoteAddr, r.UserAgent())
 		next.ServeHTTP(w, r)
 	})
 }
