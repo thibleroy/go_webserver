@@ -27,3 +27,7 @@ type IEnvironment struct {
 	MongoURL string
 	MongoPort int
 }
+
+type IPostReturn struct {
+	ID primitive.ObjectID
+}
