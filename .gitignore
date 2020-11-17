@@ -2,3 +2,4 @@ pkg/
 .env
 .idea/
 github.com/
+.DS_STORE
