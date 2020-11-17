@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"io/ioutil"
-	"log"
 	"net/http"
 )
 
@@ -46,15 +45,12 @@ func postRequest() primitive.ObjectID{
 	fmt.Println("response Headers:", resp.Header)
 	body, _ := ioutil.ReadAll(resp.Body)
 	fmt.Println("response Body:", string(body))
-	var postReturn lib.IPostReturn
-	err = json.Unmarshal(body, &postReturn)
-	if err != nil {
-		fmt.Println("err!!!!!")
-		log.Fatal(err)
-	}
-	return postReturn.ID
+	createdId := resp.Header
+	fmt.Println("header loc", createdId)
+	return primitive.ObjectID{}
 }
 
 func main(){
-	getRequest(url + "/tracks/")
+	id := postRequest()
+	fmt.Println("created id", id)
 }

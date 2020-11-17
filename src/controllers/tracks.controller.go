@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"../lib"
 	"../services"
 	"encoding/json"
 	"fmt"
@@ -9,7 +10,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"../lib"
 )
 
 func GetTrackController (w http.ResponseWriter, req *http.Request) {
@@ -33,14 +33,25 @@ func GetTracksController (w http.ResponseWriter, req *http.Request) {
 func PostTrackController (w http.ResponseWriter, req *http.Request) {
 	var track lib.ITrack
 	bodyTrack,_ := ioutil.ReadAll(req.Body)
-
 	err := json.Unmarshal(bodyTrack, &track)
 	if err != nil {
 		fmt.Println("error")
 		log.Fatal(err)
 	}
 	returnId := services.PostTrack(track)
+	w.Header().Add("Location", req.Host + req.RequestURI + "/" + returnId.Hex())
+}
+
+func PuttTrackController (w http.ResponseWriter, req *http.Request) {
+	var track lib.ITrack
+	bodyTrack,_ := ioutil.ReadAll(req.Body)
+
+	err := json.Unmarshal(bodyTrack, &track)
+	if err != nil {
+		fmt.Println("error")
+		log.Fatal(err)
+	}
+	returnId := services.PutTrack(track)
 	value, _ := json.Marshal(lib.IPostReturn{ID: returnId})
 	w.Write(value)
 }
-
