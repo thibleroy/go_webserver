@@ -5,5 +5,6 @@ import (
 )
 
 func LoadRouters(router *mux.Router) {
+	router.StrictSlash(true)
 	loadMusicRoutes(router)
 }
