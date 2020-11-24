@@ -1,10 +1,10 @@
 package main
 
 import (
-	"./src/lib"
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"go_webserver/src/lib"
 	"io/ioutil"
 	"log"
 	"net/http"
