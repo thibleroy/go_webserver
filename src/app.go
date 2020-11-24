@@ -1,17 +1,20 @@
 package src
 
 import (
-	"./lib"
-	"./lib/db"
-	"./lib/http"
-	"./middlewares"
-	"./routes"
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
+	"go_webserver/src/lib"
+	"go_webserver/src/lib/db"
+	"go_webserver/src/lib/http"
+	"go_webserver/src/middlewares"
+	"go_webserver/src/routes"
 )
 
 func InitServer(env lib.IEnvironment) {
+	// saves environment in local variable
+	lib.Environment = env
+
 	// prints running environment
 	APIEnv, _ := json.Marshal(env)
 	fmt.Println("API Environment", string(APIEnv))
@@ -30,3 +33,4 @@ func InitServer(env lib.IEnvironment) {
 	// initializes the http server with previously created Mux router
 	http.InitWebServer(env.WebServerPort, lib.Router)
 }
+

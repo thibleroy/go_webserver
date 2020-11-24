@@ -9,3 +9,4 @@ import (
 var MyMusicAPIDB mongo.Database
 var DBContext context.Context
 var Router *mux.Router
+var Environment IEnvironment

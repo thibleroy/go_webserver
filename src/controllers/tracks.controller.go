@@ -1,12 +1,12 @@
 package controllers
 
 import (
-	"../lib"
-	"../services"
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go_webserver/src/lib"
+	"go_webserver/src/services"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -19,7 +19,7 @@ func GetTrackController (w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	track, getError := services.GetTrack(objId)
+	track, getError := services.RetrieveTrack(objId)
 	if getError != nil {
 		w.WriteHeader(404)
 		return
@@ -29,7 +29,11 @@ func GetTrackController (w http.ResponseWriter, req *http.Request) {
 }
 
 func GetTracksController (w http.ResponseWriter, req *http.Request) {
-	tracks := services.GetTracks()
+	tracks, err := services.RetrieveAllTracks()
+	if err != nil {
+		w.WriteHeader(404)
+		return
+	}
 	value, _ := json.Marshal(tracks)
 	w.Write(value)
 }
@@ -42,7 +46,8 @@ func PostTrackController (w http.ResponseWriter, req *http.Request) {
 		fmt.Println("error")
 		log.Fatal(err)
 	}
-	returnId := services.PostTrack(track)
+	track.Resource = lib.NewResource()
+	returnId, err := services.AddTrack(track)
 	w.Header().Add("Location", "http://" +req.Host + req.RequestURI + "/" + returnId.Hex())
 	w.WriteHeader(201)
 }
@@ -61,8 +66,13 @@ func PutTrackController (w http.ResponseWriter, req *http.Request) {
 		fmt.Println("error")
 		log.Fatal(err)
 	}
-	track.ID = objId
-	returnId := services.PutTrack(track)
+	track.Resource.ID = objId
+	returnId, dbError := services.UpdateTrack(track)
+	if dbError != nil{
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"message":"`+dbError.Error()+`"}`))
+		return
+	}
 	w.WriteHeader(204)
 	w.Header().Add("Location", req.Host + req.RequestURI + "/" + returnId.Hex())
 }
@@ -74,6 +84,6 @@ func DeleteTrackController (w http.ResponseWriter, req *http.Request) {
 	if errId != nil {
 		log.Fatal(errId)
 	}
-	services.DeleteTrack(objId)
+	_, _ = services.RemoveTrack(objId)
 	w.WriteHeader(204)
 }

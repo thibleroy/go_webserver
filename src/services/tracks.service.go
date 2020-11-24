@@ -1,71 +1,64 @@
 package services
 
 import (
-	"../lib"
 	"context"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	_ "go.mongodb.org/mongo-driver/mongo"
-	"log"
+	"go_webserver/src/lib"
 	"time"
 )
 
+const trackCollectionName = "track"
 
-func GetTrack(id primitive.ObjectID) (lib.ITrack, error) {
-	var trackToRetrieve lib.ITrack
-	err := lib.MyMusicAPIDB.Collection("track").FindOne(context.TODO(), bson.M{"id": id}).Decode(&trackToRetrieve)
+func RetrieveTrack(id primitive.ObjectID) (*lib.ITrack, error) {
+	trackToRetrieve := lib.ITrack{}
+	err := lib.MyMusicAPIDB.Collection(trackCollectionName).FindOne(context.TODO(), bson.M{"resource.id": id}).Decode(&trackToRetrieve)
 	if err != nil {
-		return lib.ITrack{}, err
-	} else {
-		return trackToRetrieve, nil
+		print("err", err.Error())
+		return nil, err
 	}
+	return &trackToRetrieve, nil
 }
 
-func PostTrack(track lib.ITrack) primitive.ObjectID {
-	creationTime := time.Now()
-	newTrackId := primitive.NewObjectIDFromTimestamp(creationTime)
-	trackToInsert := lib.ITrack{
-		ID: newTrackId,
-		CreatedAt: creationTime,
-		UpdatedAt: creationTime,
-		Title:     track.Title,
-		Artist:    track.Artist,
-	}
-	_, err := lib.MyMusicAPIDB.Collection("track").InsertOne(context.TODO(), trackToInsert)
+func AddTrack(track lib.ITrack) (*primitive.ObjectID, error) {
+	fmt.Println("obj", track)
+	track.Resource = lib.NewResource()
+	_, err := lib.MyMusicAPIDB.Collection(trackCollectionName).InsertOne(context.TODO(), track)
 	if err != nil {
-		log.Fatal("insert error", err)
+		return nil, err
 	}
-	return newTrackId
+	return &track.Resource.ID, nil
 }
 
-func PutTrack(track lib.ITrack) primitive.ObjectID {
+func UpdateTrack(track lib.ITrack) (*primitive.ObjectID, error) {
 	updateTime := time.Now()
-	track.UpdatedAt = updateTime
+	track.Resource.UpdatedAt = updateTime
 	update := bson.M{
 		"$set": track,
 	}
-	_, err := lib.MyMusicAPIDB.Collection("track").UpdateOne(context.TODO(),bson.M{"id": track.ID}, update)
+	_, err := lib.MyMusicAPIDB.Collection(trackCollectionName).UpdateOne(context.TODO(),bson.M{"resource.id": track.Resource.ID}, update)
 	if err != nil {
-		log.Fatal("update error", err)
+		return nil, err
 	}
-	return track.ID
+	return &track.Resource.ID, nil
 }
 
-func GetTracks() []lib.ITrack {
+func RetrieveAllTracks() (*[]lib.ITrack, error) {
 	var retrievedTracks []lib.ITrack
-	cursor,_ :=lib.MyMusicAPIDB.Collection("track").Find(context.TODO(), bson.M{})
+	cursor,_ :=lib.MyMusicAPIDB.Collection(trackCollectionName).Find(context.TODO(), bson.M{})
 	err := cursor.All(context.TODO(), &retrievedTracks)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	return retrievedTracks
+	return &retrievedTracks, nil
 }
 
-func DeleteTrack(id primitive.ObjectID){
-	res, err := lib.MyMusicAPIDB.Collection("track").DeleteOne(context.TODO(), bson.M{"id": id})
+func RemoveTrack(id primitive.ObjectID) (*primitive.ObjectID, error){
+	_, err := lib.MyMusicAPIDB.Collection(trackCollectionName).DeleteOne(context.TODO(), bson.M{"resource.id": id})
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	fmt.Println("deleted docuements", res.DeletedCount)
+	return &id, nil
 }

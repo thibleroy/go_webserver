@@ -1,8 +1,8 @@
 package main
 
 import (
-    app "./src"
-    "./src/lib"
+    app "go_webserver/src"
+    "go_webserver/src/lib"
 )
 
 func main(){
