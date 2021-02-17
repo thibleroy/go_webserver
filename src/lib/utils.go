@@ -1,14 +1,10 @@
 package lib
 
 import (
-	"github.com/dgrijalva/jwt-go"
 	"github.com/joho/godotenv"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"golang.org/x/crypto/bcrypt"
 	"log"
 	"os"
 	"strconv"
-	"time"
 )
 
 func dotEnvVariable(key string) string {
@@ -34,31 +30,4 @@ func GetServerEnv() IEnvironment {
 		JwtSecret:     jwtSecretStr,
 	}
 	return serverEnvironment
-}
-
-func GetHash(pwd []byte) string {
-	hash, err := bcrypt.GenerateFromPassword(pwd, bcrypt.MinCost)
-	if err != nil {
-		log.Println(err)
-	}
-	return string(hash)
-}
-
-func NewResource() IResource{
-	creationTime := time.Now()
-	return IResource{
-		ID:        primitive.NewObjectIDFromTimestamp(creationTime),
-		CreatedAt: creationTime,
-		UpdatedAt: creationTime,
-	}
-}
-
-func GenerateJWT(secret string)(string,error){
-	token:= jwt.New(jwt.SigningMethodHS256)
-	tokenString, err :=  token.SignedString(secret)
-	if err !=nil{
-		log.Println("Error in JWT token generation")
-		return "",err
-	}
-	return tokenString, nil
 }

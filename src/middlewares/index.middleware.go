@@ -6,7 +6,6 @@ import (
 )
 
 func LoadMiddlewares(router *mux.Router) {
-	router.Use(authMiddleware)
 	router.Use(loggingMiddleware)
 	router.Use(headersMiddleware)
 	fmt.Println("middlewares loaded")
